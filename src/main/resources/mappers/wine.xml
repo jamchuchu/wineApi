@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.directional.wine.repository.WineRepository">
+
+    <insert id="create" useGeneratedKeys="true" keyProperty="wineId"
+            parameterType="io.directional.wine.Entity.Wine">
+        INSERT INTO wine
+        VALUES (#{wineId}, #{type}, #{nameKr}, #{nameEng}, #{alcohol}, #{acidity}, #{body},
+        #{sweetness}, #{tannin}, #{servingTemperature}, #{score}, #{price}, #{style},
+        #{grade}, #{importer}, #{wineryNameKr}, #{wineryNameEng}, #{regionNameKr}, #{regionNameEng})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM wine
+        WHERE
+        WineId = #{wineId}
+    </delete>
+
+    <update id="update"  keyProperty="wineId"
+            parameterType="io.directional.wine.Entity.Wine">
+        UPDATE wine
+        SET
+        wineId = #{wineId},
+        type = #{wine.type},
+        name_korean = #{wine.nameKr},
+        name_english = #{wine.nameEng},
+        alcohol = #{wine.alcohol},
+        acidity = #{wine.acidity},
+        body = #{wine.body},
+        sweetness = #{wine.sweetness},
+        tannin = #{wine.tannin},
+        serving_temperature = #{wine.servingTemperature},
+        score = #{wine.score},
+        price = #{wine.price},
+        style = #{wine.style},
+        grade = #{wine.grade},
+        importer = #{wine.importer},
+        winery_name_korean = #{wine.wineryNameKr},
+        winery_name_english = #{wine.wineryNameEng},
+        region_name_korean = #{wine.regionNameKr},
+        region_name_english = #{wine.regionNameEng}
+        WHERE
+        wineId = #{wineId}
+    </update>
+
+    <select id="searchWineByWineName" resultType="io.directional.wine.Entity.Wine">
+        select
+            wineId,
+            type,
+            name_korean AS nameKr,
+            name_english AS nameEng,
+            alcohol,
+            acidity,
+            body,
+            sweetness,
+            tannin,
+            serving_temperature AS servingTemperature,
+            score,
+            price,
+            style,
+            grade,
+            importer,
+            winery_name_korean AS wineryNameKr,
+            winery_name_english AS wineryNameEng,
+            region_name_korean AS regionNameKr,
+            region_name_english AS regionNameEng
+        from
+            wine
+        where
+            name_korean = #{wineName} or name_english = #{wineName}
+    </select>
+
+    <select id="searchWinesByWinery" resultType="Integer">
+        select
+            wineId
+        from
+            wine
+        where
+            winery_name_english = #{wineryName} or winery_name_korean = #{wineryName}
+
+    </select>
+
+    <select id = "searchWineByWineId" resultType="io.directional.wine.Entity.Wine">
+        select
+            wineId,
+            type,
+            name_korean AS nameKr,
+            name_english AS nameEng,
+            alcohol,
+            acidity,
+            body,
+            sweetness,
+            tannin,
+            serving_temperature AS servingTemperature,
+            score,
+            price,
+            style,
+            grade,
+            importer,
+            winery_name_korean AS wineryNameKr,
+            winery_name_english AS wineryNameEng,
+            region_name_korean AS regionNameKr,
+            region_name_english AS regionNameEng
+        from
+            wine
+        where
+            wineId = #{wineId}
+    </select>
+
+    <select id="sortWineBycriterion" resultType="Integer">
+        select
+            wineId
+        from
+            wine
+        where
+            1 = 1
+        <choose>
+            <when test="criterion == 'name_korean'">
+                ORDER BY name_korean
+            </when>
+            <when test="criterion == 'name_english'">
+                ORDER BY name_english
+            </when>
+            <when test="criterion == 'alcohol'">
+                ORDER BY alcohol
+            </when>
+            <when test="criterion == 'acidity'">
+                ORDER BY acidity
+            </when>
+            <when test="criterion == 'body'">
+                ORDER BY body
+            </when>
+            <when test="criterion == 'sweetness'">
+                ORDER BY sweetness
+            </when>
+            <when test="criterion == 'tannin'">
+                ORDER BY tannin
+            </when>
+            <when test="criterion == 'score'">
+                ORDER BY score
+            </when>
+            <when test="criterion == 'price'">
+                ORDER BY price
+            </when>
+            <otherwise>
+                <!-- 정렬 기준이 올바르지 않을 경우, 기본 정렬 -->
+                ORDER BY default_column
+            </otherwise>
+        </choose>
+    </select>
+
+
+
+    <select id="filterWineWithoutRange" resultType="io.directional.wine.Entity.Wine">
+        select
+            wineId,
+            type,
+            name_korean AS nameKr,
+            name_english AS nameEng,
+            alcohol,
+            acidity,
+            body,
+            sweetness,
+            tannin,
+            serving_temperature AS servingTemperature,
+            score,
+            price,
+            style,
+            grade,
+            importer,
+            winery_name_korean AS wineryNameKr,
+            winery_name_english AS wineryNameEng,
+            region_name_korean AS regionNameKr,
+            region_name_english AS regionNameEng
+            from
+            wine
+        where
+            1 = 1
+        <choose>
+            <when test="filterName == 'type'">
+                and type = #{property}
+            </when>
+            <when test="filterName == 'style'">
+                and style = #{property}
+            </when>
+            <when test="filterName == 'grade'">
+                and grade = #{property}
+            </when>
+            <when test="filterName == 'region'">
+                and (region_name_korean = #{property} or region_name_english = #{property})
+            </when>
+            <otherwise>
+                <!-- 정렬 기준이 올바르지 않을 경우, 기본 정렬 -->
+                ORDER BY default_column
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="filterWineWithRange" resultType="io.directional.wine.Entity.Wine">
+        select
+            wineId,
+            type,
+            name_korean AS nameKr,
+            name_english AS nameEng,
+            alcohol,
+            acidity,
+            body,
+            sweetness,
+            tannin,
+            serving_temperature AS servingTemperature,
+            score,
+            price,
+            style,
+            grade,
+            importer,
+            winery_name_korean AS wineryNameKr,
+            winery_name_english AS wineryNameEng,
+            region_name_korean AS regionNameKr,
+            region_name_english AS regionNameEng
+        from
+            wine
+        where
+            1 = 1
+        <choose>
+            <when test="filterName == 'alcohol'">
+                and alcohol between #{min} and #{max}
+            </when>
+            <when test="filterName == 'price'">
+                and price between #{min} and #{max}
+            </when>
+            <otherwise>
+                <!-- 정렬 기준이 올바르지 않을 경우, 기본 정렬 -->
+                ORDER BY default_column
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchAromaByWineName" resultType="String">
+        select aroma
+        from wine_aroma
+        where name_english = #{wineName}
+    </select>
+    <select id="searchPairingByWineName" resultType="String">
+        select pairing
+        from wine_pairing
+        where name_english = #{wineName}
+    </select>
+    <select id="searchGrapeByWineName" resultType="String">
+        select grape_name_english
+        from wine_grape
+        where name_english = #{wineName}
+    </select>
+
+
+</mapper>

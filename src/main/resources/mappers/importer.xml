@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.directional.wine.repository.ImporterRepository">
+    <select id ="searchImportersByImporterName" resultType = "String">
+        select
+            name_english as wineNames
+        from
+            wine
+        where
+            importer = #{importerName}
+    </select>
+
+    <select id="sortImporter" resultType="String">
+        select
+            importer
+        from
+            wine
+        group by
+            importer
+        order by
+            importer
+
+    </select>
+</mapper>

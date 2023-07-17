@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.directional.wine.repository.RegionRepository">
+
+    <insert id="create" useGeneratedKeys="true" keyProperty="regionId"
+            parameterType="io.directional.wine.Entity.Region">
+        INSERT INTO region
+        VALUES (#{regionId}, #{regionNameKr}, #{regionNameEng}, #{parentRegionNameKr}, #{parentRegionNameEng})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM region
+        WHERE
+        regionId = #{regionId}
+    </delete>
+
+    <update id="update"  keyProperty="regionId"
+            parameterType="io.directional.wine.Entity.Region">
+        UPDATE region
+        SET
+        regionId = #{regionId},
+        name_korean = #{region.regionNameKr},
+        name_english = #{region.regionNameEng},
+        parent_name_korean = #{region.parentRegionNameKr},
+        parent_name_english = #{region.parentRegionNameEng}
+        WHERE
+        regionId = #{regionId}
+    </update>
+
+    <select id="searchRegionByRegionId" parameterType="Integer" resultType="io.directional.wine.Entity.Region">
+        select
+            regionId,
+            name_korean,
+            name_english,
+            parent_name_korean,
+            parent_name_english
+        from
+            region
+        where
+            regionId =#{regionId}
+    </select>
+
+    <select id="searchRegionNameByRegionId" parameterType="Integer" resultType="String">
+        select
+            name_english
+        from
+            region
+        where
+            regionId = #{regionId}
+    </select>
+
+    <select id="searchRegionByRegionName" parameterType="String" resultType="io.directional.wine.Entity.Region">
+        select
+            regionId,
+            name_korean,
+            name_english,
+            parent_name_korean,
+            parent_name_english
+        from
+            region
+        where
+            name_korean = #{regionName} or name_english = #{regionName}
+    </select>
+
+    <select id="sortRegion" resultType="Integer">
+        select
+            regionId
+        from
+            region
+        where
+            1=1
+        <choose>
+        <when test="criteria == 'kr'">
+            ORDER BY name_korean
+        </when>
+        <when test="criteria == 'eng'">
+            ORDER BY name_english
+        </when>
+        </choose>
+    </select>
+
+    <select id="searchRegionByParentRegionName" resultType="Integer">
+        select
+            regionId
+        from
+            region
+        where
+            parent_name_korean = #{parentRegionName} or parent_name_english = #{parentRegionName}
+    </select>
+
+    <select id="searchParentRegionNameByRegionName" resultType="String">
+        select
+            parent_name_english
+        from
+            region
+        where
+            name_korean = #{regionName} or name_english = #{regionName}
+    </select>
+
+    <select id="findInfoForSingleTypeAsGrape"  parameterType="String" resultType="String">
+        select
+            GW.grapeEng
+        from
+            wine as W
+        join(
+        select
+            G.name_english as grapeEng,
+            WG.name_english as wineEng
+        from
+            wine_grape as WG
+        join
+            grape as G
+            on G.name_english = WG.grape_name_english) as GW on W.name_english = GW.wineEng
+        where
+            W.region_name_english = #{regionName}
+        group by
+            GW.grapeEng
+    </select>
+
+    <select id="findInfoForSingleTypeAsWinery" parameterType="String" resultType="String">
+        select
+            W.winery_name_english
+        from
+            wine as W
+        join(
+            select
+                G.name_english as grapeEng,
+                 WG.name_english as wineEng
+            from
+                wine_grape as WG
+            join
+                grape as G
+            on G.name_english = WG.grape_name_english)as GW on W.name_english = GW.wineEng
+        where
+            W.region_name_english = #{regionName}
+        group by
+            W.winery_name_english
+    </select>
+
+    <select id="findInfoForSingleTypeAsWine" parameterType="String" resultType="String">
+        select
+            W.name_english
+        from
+            wine as W
+        join(
+            select
+            G.name_english as grapeEng,
+            WG.name_english as wineEng
+        from
+            wine_grape as WG
+        join
+            grape as G
+            on G.name_english = WG.grape_name_english)as GW on W.name_english = GW.wineEng
+        where
+            W.region_name_english = #{regionName}
+        group by
+            W.name_english
+    </select>
+
+</mapper>

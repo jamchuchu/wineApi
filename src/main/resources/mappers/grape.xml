@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.directional.wine.repository.GrapeRepository">
+
+    <insert id="create" useGeneratedKeys="true" keyProperty="grapeId"
+            parameterType="io.directional.wine.Entity.Grape">
+        INSERT INTO grape
+        VALUES (#{grapeId}, #{nameKr}, #{nameEng}, #{acidity}, #{body}, #{sweetness}, #{tannin})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM grape
+        WHERE
+        grapeId = #{grapeId}
+    </delete>
+
+    <update id="update"  keyProperty="grapeId"
+            parameterType="io.directional.wine.Entity.Grape">
+        UPDATE grape
+        SET
+            grapeId = #{grapeId},
+            name_korean = #{grape.nameKr},
+            name_english = #{grape.nameEng},
+            acidity = #{grape.acidity},
+            body = #{grape.body},
+            sweetness = #{grape.sweetness},
+            tannin = #{grape.tannin}
+        WHERE
+            grapeId = #{grapeId}
+    </update>
+
+    <select id="searchGrapeByGrapeName" resultType="io.directional.wine.Entity.Grape">
+        select
+        grapeId,
+        name_korean as nameKr,
+        name_english as nameEnglish,
+        acidity,
+        body,
+        sweetness,
+        tannin
+        from
+        grape
+        where
+        name_korean = #{grapeName} or name_english = #{grapeName}
+    </select>
+
+    <select id="sortGrape" resultType="Integer">
+        select
+        grapeId
+        from
+        grape
+        where
+        1=1
+        <choose>
+            <when test="criteria == 'name_korean'">
+                ORDER BY name_korean
+            </when>
+            <when test="criteria == 'name_english'">
+                ORDER BY name_english
+            </when>
+            <when test="criteria == 'acidity'">
+                ORDER BY acidity
+            </when>
+            <when test="criteria == 'body'">
+                ORDER BY body
+            </when>
+            <when test="criteria == 'sweetness'">
+                ORDER BY sweetness
+            </when>
+            <when test="criteria == 'tannin'">
+                ORDER BY tannin
+            </when>
+            <otherwise>
+                <!-- 정렬 기준이 올바르지 않을 경우, 기본 정렬 -->
+                ORDER BY default_column
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchGrapeNameByRegion" resultType="String">
+        select
+        GW.grapeEng
+        from
+        wine as W
+        join(
+        select
+        G.name_english as grapeEng,
+        WG.name_english as wineEng
+        from
+        wine_grape as WG
+        join
+        grape as G
+        on G.name_english = WG.grape_name_english
+        )as GW on W.name_english = GW.wineEng
+        where
+        W.region_name_english = #{region}
+        group by
+        GW.grapeEng
+    </select>
+
+    <select id="searchWinesByGrape" resultType="java.lang.String">
+        select
+        name_english
+        from
+        wine_grape
+        where
+        grape_name_korean = #{grapeName} or grape_name_english = #{grapeName}
+    </select>
+
+    <select id="searchGrapeByGrapeId" parameterType="Integer" resultType="io.directional.wine.Entity.Grape">
+        select
+        grapeId,
+        name_korean as nameKr,
+        name_english as nameEnglish,
+        acidity,
+        body,
+        sweetness,
+        tannin
+        from
+        grape
+        where
+        grapeId = #{grapeId}
+    </select>
+</mapper>

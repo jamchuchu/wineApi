@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.directional.wine.repository.WineryRepository">
+    <insert id="create" useGeneratedKeys="true" keyProperty="wineryId"
+            parameterType="io.directional.wine.Entity.Winery">
+        INSERT INTO winery
+        VALUES (#{wineryId}, #{nameKr}, #{nameEng}, #{regionNameKr}, #{regionNameEng})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM winery
+        WHERE
+        wineryId = #{wineryId}
+    </delete>
+
+    <update id="update"  keyProperty="wineryId"
+            parameterType="io.directional.wine.Entity.Winery">
+        UPDATE winery
+        SET
+        wineryId = #{wineryId},
+        name_korean = #{winery.nameKr},
+        name_english = #{winery.nameEng},
+        region_name_korean = #{winery.regionNameKr},
+        region_name_english = #{winery.regionNameEng}
+        WHERE
+        wineryId = #{wineryId}
+    </update>
+
+    <select id = "searchWineryByWineryName" resultType="io.directional.wine.Entity.Winery">
+        select
+            wineryId,
+            name_korean as nameKr,
+            name_english as nameEng,
+            region_name_korean as regionNameKr,
+            region_name_english as regionNameEng
+        from
+            winery
+        where
+            name_korean = #{wineryName} or name_english = #{wineryName}
+    </select>
+
+    <select id = "searchWineryByWineryId" resultType="io.directional.wine.Entity.Winery">
+        select
+            wineryId,
+            name_korean as nameKr,
+            name_english as nameEng,
+            region_name_korean as regionNameKr,
+            region_name_english as regionNameEng
+        from
+            winery
+        where
+            wineryId = #{wineryId}
+    </select>
+
+    <select id="sortWinery" resultType="Integer">
+        select wineryId
+        from winery
+        where 1 = 1
+        <choose>
+            <when test="language == 'kr'">
+                ORDER BY name_korean
+            </when>
+            <when test="language == 'eng'">
+                ORDER BY name_english
+            </when>
+        </choose>
+    </select>
+
+    <select id="searchWineryByRegion" resultType="Integer">
+        select
+            wineryId
+        from
+            winery
+        where
+             region_name_korean = #{region} or region_name_english = #{region}
+    </select>
+
+</mapper>
